@@ -123,7 +123,46 @@ public class NumberTriangle {
      * @throws IOException may naturally occur if an issue reading the file occurs
      */
     public static NumberTriangle loadTriangle(String fname) throws IOException {
+        // open the file and get a BufferedReader object whose methods
+        // are more convenient to work with when reading the file contents.
+        InputStream inputStream = NumberTriangle.class.getClassLoader().getResourceAsStream(fname);
+        BufferedReader br = new BufferedReader(new InputStreamReader(inputStream));
 
+        NumberTriangle top = null;
+        List<List<NumberTriangle>> rows = new ArrayList<>();
+        String line = br.readLine();
+        while (line != null) {
+
+            line = line.trim();
+            if (!line.isEmpty()) {
+                String[] numbers = line.split("\\s+");
+                //Using regex to split for any whitespace
+                List<NumberTriangle> currentRow = new ArrayList<>();
+
+                for (String num : numbers) {
+                    currentRow.add(new NumberTriangle(Integer.parseInt(num)));
+                }
+
+                rows.add(currentRow);
+            }
+
+            line = br.readLine();
+        }
+        br.close();
+
+        for (int i = 0; i < rows.size() - 1; i++) {
+            List<NumberTriangle> current = rows.get(i);
+            List<NumberTriangle> next = rows.get(i + 1);
+
+            for (int j = 0; j < current.size(); j++) {
+                current.get(j).setLeft(next.get(j));
+                current.get(j).setRight(next.get(j + 1));
+            }
+        }
+        if (!rows.isEmpty()) {
+            top = rows.get(0).get(0);
+        }
+        return top;
     }
 
     public static void main(String[] args) throws IOException {
